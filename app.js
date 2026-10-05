@@ -8,7 +8,7 @@ const done = () => store.get('q', {});
 const mark = (key, ok) => { const q = done(); q[key] = ok ? 1 : 0; store.set('q', q); nav(); };
 const unitScore = u => { const q = done(); return u.quiz.filter((_, i) => q[`${u.id}-${i}`] === 1).length; };
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const EXTRA = [['practice', 'Practice midterm', 'P'], ['past', 'Past quizzes', 'Q'], ['mock', 'Mock exam', 'M'], ['formulas', 'Formula sheet', 'ƒ']];
+const EXTRA = [['practice', 'Practice midterm', 'P'], ['past', 'Past quizzes', 'Q'], ['glossary', 'Glossary', 'A'], ['mock', 'Mock exam', 'M'], ['formulas', 'Formula sheet', 'ƒ']];
 const KIND = { mc: 'Multiple choice', num: 'Calculate', fill: 'Fill in the blank', short: 'Short answer' };
 
 function route() {
@@ -74,6 +74,7 @@ function home(main) {
       <a class="tile" href="#practice"><span class="num">START HERE</span><strong>Practice midterm</strong><span class="d">The instructor's sample questions with worked answers.</span></a>
       <a class="tile" href="#past"><span class="num">SEEN BEFORE</span><strong>Past quizzes</strong><span class="d">${PAST.length} questions from the course quizzes so far.</span></a>
       <a class="tile" href="#mock"><span class="num">TEST YOURSELF</span><strong>Mock exam</strong><span class="d">Twenty questions drawn at random from all seven units.</span></a>
+      <a class="tile" href="#glossary"><span class="num">LOOK UP</span><strong>Glossary</strong><span class="d">${GLOSSARY.length} terms from the decks, quizzes and practice exam, searchable.</span></a>
       <a class="tile" href="#formulas"><span class="num">MEMORIZE</span><strong>Formula sheet</strong><span class="d">Every formula, test and rule-of-thumb number in one place.</span></a>
     </div></div>
     <p class="note">Built from Dr. Aric LaBarr's lecture decks and <a href="${SITE}" target="_blank" rel="noopener">course site</a>. Progress is saved in this browser only.</p></div>`;
@@ -149,6 +150,20 @@ function past(main) {
   });
 }
 
+function glossary(main) {
+  main.innerHTML = `<div class="col"><header><p class="eyebrow">Every term in one list</p><h1>Glossary</h1></header>
+    <p class="lede">${GLOSSARY.length} terms from the seven decks, the quizzes and the practice midterm. Type to filter; each term links to the unit that explains it.</p>
+    <input type="text" id="gl-q" placeholder="Search terms and definitions" aria-label="Search the glossary" style="max-width:420px">
+    <p class="note" id="gl-n"></p><div class="tw"><table id="gl-t"></table></div></div>`;
+  const draw = () => {
+    const q = $('#gl-q', main).value.trim().toLowerCase();
+    const rows = GLOSSARY.filter(([t, d]) => !q || (t + ' ' + d).toLowerCase().includes(q));
+    $('#gl-n', main).textContent = rows.length === GLOSSARY.length ? '' : `${rows.length} of ${GLOSSARY.length} terms`;
+    $('#gl-t', main).innerHTML = rows.map(([t, d, u]) => `<tr><td><b>${esc(t)}</b></td><td>${esc(d)}</td><td><a href="#${u}">${UNITS.find(x => x.id === u).title}</a></td></tr>`).join('') || '<tr><td>No term matches that search.</td></tr>';
+  };
+  $('#gl-q', main).oninput = draw; draw();
+}
+
 function mock(main) {
   const pool = UNITS.flatMap(u => u.quiz.map((q, i) => ({ q, key: `${u.id}-${i}`, u })));
   const pick = pool.sort(() => Math.random() - 0.5).slice(0, 20);
@@ -188,7 +203,7 @@ function formulas(main) {
 function render() {
   const { page, tab } = route(), main = $('#main'), u = UNITS.find(x => x.id === page);
   if (u) unit(main, u, ['notes', 'lab', 'cards', 'quiz'].includes(tab) ? tab : 'notes');
-  else if (page === 'practice') practice(main); else if (page === 'past') past(main); else if (page === 'mock') mock(main); else if (page === 'formulas') formulas(main); else home(main);
+  else if (page === 'practice') practice(main); else if (page === 'past') past(main); else if (page === 'glossary') glossary(main); else if (page === 'mock') mock(main); else if (page === 'formulas') formulas(main); else home(main);
   nav(); document.title = (u ? u.title : page === 'home' ? 'Overview' : EXTRA.find(e => e[0] === page)?.[1] || 'Overview') + ' · ML Midterm Review';
   window.scrollTo(0, 0);
 }

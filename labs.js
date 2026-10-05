@@ -175,7 +175,7 @@ LABS.diag = el => {
     <canvas id="dg-c"></canvas><div class="chips" id="dg-o"></div><div class="verdict" id="dg-v" hidden></div>
     <div class="row"><button class="btn alt" id="dg-n">New plot</button><span class="mono" id="dg-s"></span></div>
     <h2>Variance inflation factor</h2>
-    <p>R²ⱼ is how well the <em>other predictors</em> explain predictor j. The target is not involved.</p>
+    <p>R²<sub>j</sub> is how well the <em>other predictors</em> explain predictor j. The target is not involved.</p>
     <label class="ctl">R² of predictor j on the other predictors <output id="vf-o"></output><input type="range" id="vf-r" min="0" max="99" value="50"></label>
     <div class="stats" id="vf-s"></div><div class="verdict" id="vf-v"></div>`;
   const show = () => {

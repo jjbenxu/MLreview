@@ -12,10 +12,10 @@ const NOTEFIGS = (() => {
       ch.dots(seq(0.5, 9.5, 34).map(x => [x, Math.max(0.3, Math.min(9.7, 1 + 0.8 * x + normal(r) * 1.1))])); ch.line([[0, 1], [10, 9]], '--mark', 2);
       ch = chart(panel(f, 'Supervised classification'), { w: S, h: H, x: [0, 10], y: [0, 10], xl: 'predictor 1', yl: 'predictor 2' });
       const a = [], b = []; for (let i = 0; i < 26; i++) { a.push([3 + normal(r) * 1.2, 6.8 + normal(r) * 1.2]); b.push([7 + normal(r) * 1.2, 3.2 + normal(r) * 1.2]); }
-      ch.dots(a, '--accent'); ch.dots(b, '--bad'); ch.line([[1, 0.5], [9.5, 9.5]], '--mark', 2, [5, 4]); text(ch, 0.4, 9.2, 'class 1', '--accent'); text(ch, 9.6, 0.6, 'class 0', '--bad', 'right');
+      ch.dots(a, '--accent'); ch.dots(b, '--bad'); ch.line([[1, 0.5], [9.5, 9.5]], '--mark', 2, [5, 4]); text(ch, 0.3, 3.9, 'class 1', '--accent'); text(ch, 9.8, 6.7, 'class 0', '--bad', 'right');
       ch = chart(panel(f, 'Unsupervised'), { w: S, h: H, x: [0, 10], y: [0, 10], xl: 'variable 1', yl: 'variable 2' });
       const u = []; [[2.5, 7.5], [7.5, 7], [5, 2.5]].forEach(([cx, cy]) => { for (let i = 0; i < 18; i++) u.push([cx + normal(r) * 0.9, cy + normal(r) * 0.9]); });
-      ch.dots(u, '--muted'); text(ch, 5, 9.3, 'no target, no colors: find the groups', '--muted', 'center');
+      ch.dots(u, '--muted');
     },
     featEng(f) {
       const r = rng(5), inn = [], out = [];
@@ -47,7 +47,7 @@ const NOTEFIGS = (() => {
       ch = chart(panel(f, 'After: log(target)'), { w: 270, h: 220, x: [0, 10.5], y: [-20, 20], yt: [-20, 0, 20], xl: 'predicted value', yl: 'residual' }); ch.line([[0, 0], [10.5, 0]], '--muted', 1); ch.dots(lg);
     },
     vifCurve(f) {
-      const ch = chart(panel(f, 'VIF as the other predictors explain more of xⱼ'), { w: 440, h: 230, x: [0, 1], y: [0, 30], xt: [0, 0.25, 0.5, 0.75, 0.9, 1], yt: [0, 10, 20, 30], xl: 'R² of xⱼ on the other predictors', yl: 'VIF' });
+      const ch = chart(panel(f, 'VIF as the other predictors explain more of predictor j'), { w: 440, h: 230, x: [0, 1], y: [0, 30], xt: [0, 0.25, 0.5, 0.75, 0.9, 1], yt: [0, 10, 20, 30], xl: 'R² of predictor j on the other predictors', yl: 'VIF' });
       ch.line(seq(0, 0.9667, 120).map(x => [x, 1 / (1 - x)]), '--accent', 2.4); ch.line([[0, 10], [1, 10]], '--bad', 1.3, [5, 4]); ch.dots([[0.9, 10]], '--bad', 5); text(ch, 0.02, 11.5, 'too high above 10', '--bad');
     },
     chi2(f) {
@@ -71,7 +71,7 @@ const NOTEFIGS = (() => {
       let ch = chart(panel(f, 'Normal data: a peak to find'), { w: 270, h: 220, x: [-2, 6], y: [-60, 0], xt: [-2, 0, 2, 4, 6], xl: 'candidate value of β', yl: 'log-likelihood' });
       ch.line(seq(-2, 6).map(b => [b, -8 - 3.2 * (b - 2) ** 2]), '--accent', 2.4); ch.dots([[2, -8]], '--mark', 5); text(ch, 2, -2.5, 'maximum = β̂', '--mark', 'center');
       ch = chart(panel(f, 'Separation: no peak, no convergence'), { w: 270, h: 220, x: [-2, 6], y: [-60, 0], xt: [-2, 0, 2, 4, 6], xl: 'candidate value of β', yl: 'log-likelihood' });
-      ch.line(seq(-2, 6).map(b => [b, -55 * Math.exp(-(b + 2) / 2.2) - 1.5]), '--bad', 2.4); text(ch, 5.9, -12, 'keeps climbing as β → ∞', '--bad', 'right');
+      ch.line(seq(-2, 6).map(b => [b, -55 * Math.exp(-(b + 2) / 2.2) - 1.5]), '--bad', 2.4); text(ch, 5.9, -30, 'keeps climbing as β → ∞', '--bad', 'right');
     },
     roc(f) {
       const ch = chart(panel(f, 'ROC curves'), { w: 340, h: 300, x: [0, 1], y: [0, 1], xt: [0, 0.5, 1], yt: [0, 0.5, 1], xl: 'false positive rate (1 − specificity)', yl: 'true positive rate (sensitivity)' });
@@ -86,7 +86,7 @@ const NOTEFIGS = (() => {
     lift(f) {
       const gain = d => 1 - Math.pow(1 - d, 3.2);
       let ch = chart(panel(f, 'Lift chart'), { w: 270, h: 230, x: [0, 1], y: [0, 3.5], xt: [0, 0.5, 1], yt: [1, 2, 3], xl: 'depth (share of customers targeted)', yl: 'lift' });
-      ch.line([[0, 1], [1, 1]], '--muted', 1.3, [5, 4]); ch.line(seq(0.03, 1).map(d => [d, gain(d) / d]), '--accent', 2.4); ch.dots([[0.1, gain(0.1) / 0.1]], '--mark', 5); text(ch, 0.14, 2.95, 'top 10%: about 2.9×', '--mark'); text(ch, 0.98, 1.15, 'random = 1', '--muted', 'right');
+      ch.line([[0, 1], [1, 1]], '--muted', 1.3, [5, 4]); ch.line(seq(0.03, 1).map(d => [d, gain(d) / d]), '--accent', 2.4); ch.dots([[0.1, gain(0.1) / 0.1]], '--mark', 5); text(ch, 0.14, 2.95, 'top 10%: about 2.9×', '--mark'); text(ch, 0.98, 0.68, 'random = 1', '--muted', 'right');
       ch = chart(panel(f, 'Cumulative capture (gain) chart'), { w: 270, h: 230, x: [0, 1], y: [0, 1], xt: [0, 0.5, 1], yt: [0, 0.5, 1], xl: 'depth', yl: 'share of all events captured' });
       ch.line([[0, 0], [1, 1]], '--muted', 1.3, [5, 4]); ch.line(seq(0, 1).map(d => [d, gain(d)]), '--accent', 2.4);
     },
