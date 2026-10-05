@@ -22,6 +22,7 @@ const UNITS = [
         <tr><td><b>Reinforcement</b></td><td>Interacting with its environment, trial and error</td><td>Autonomous vehicles</td></tr>
       </table></div>
       <p>Inside supervised learning the target decides the family: a <b>continuous</b> target is supervised <b>regression</b>; a <b>categorical</b> target is supervised <b>classification</b>. Unsupervised models have no target variable to relate the predictors to.</p>
+      <figure class="fig" data-fig="learnTypes"><figcaption>A continuous target gives a line to fit; a categorical target gives a boundary to draw; no target leaves only structure to discover.</figcaption></figure>
       <p class="trap"><b>Exam trap</b>The difference between supervised and unsupervised is the presence of a target (labels), not the algorithm's complexity. This is question 12 on the practice midterm.</p>` },
     { h: 'Reading linear regression output', b: `
       <p>Click any highlighted number. This is the simple regression from the deck: insurance <code>charges</code> predicted by <code>age</code>.</p>
@@ -92,6 +93,7 @@ age       <b data-k="b1">257.7226</b>     <b data-k="se">22.502</b>   <b data-k=
       <p class="trap"><b>Exam trap</b>The missing category for categorical variables can be added before the train/test split. Continuous imputation cannot: the median is calculated across rows, so it must be computed <b>after</b> the split, on training data only, and that training median is then used to fill the test set.</p>` },
     { h: 'Feature engineering', b: `
       <p>Feature engineering transforms raw data into variables (features) suited to a model. The slide's point: <b>better features beat fancier modeling</b>. Two classes that no straight line can separate in x₁ and x₂ become easy once the data is re-expressed as distance and direction.</p>
+      <figure class="fig" data-fig="featEng"><figcaption>Same points, different features. No straight line separates the two classes on the left; one horizontal line does on the right.</figcaption></figure>
       <p>Models usually need <b>one row per entity</b> (customer, patient, account). <b>Transactional data</b> has many rows per entity and must be aggregated: long data (many rows) becomes wide data (many columns).</p>
       <p>Common aggregations, from the patient activity:</p>
       <ul>
@@ -149,6 +151,7 @@ age       <b data-k="b1">257.7226</b>     <b data-k="se">22.502</b>   <b data-k=
     { h: 'Training vs. testing', b: `
       <p>Partition the data. The model is <b>fit on the training set</b> and its <b>performance is evaluated on the test set</b>. Sometimes there is a third piece, validation. Set a random seed so the split is replicable.</p>
       <p>Models tend to pick up small, spurious patterns in the data they were built on. Holding data out gives an <b>honest assessment</b> of how the model performs on data it has never seen, and shows whether we have <b>overfit</b>.</p>
+      <figure class="fig" data-fig="overfit"><figcaption>Training error always improves as variables are added. Error on held-out data improves, then worsens once the model starts fitting noise. Selection looks for the low point of the validation curve.</figcaption></figure>
       <p class="trap"><b>Exam trap</b>Model selection is always done on training data. The test set is for comparing final models and reporting final metrics. Do not go back and rebuild after looking at it, and do not build thousands of models to compare on it.</p>` },
     { h: 'Univariate screening and conservative p-values', b: `
       <p>With many predictors, test each one individually against the target. For a continuous target the test is an <b>F-test</b> from a simple regression of the target on that one variable. Keep the variables whose p-value is below your cut-off.</p>
@@ -166,6 +169,7 @@ age       <b data-k="b1">257.7226</b>     <b data-k="se">22.502</b>   <b data-k=
       <div class="fx">MAPE = (1/n) Σ |(Y − Ŷ) / Y|<small>average absolute percentage miss</small></div>
       <div class="fx">MSE = (1/n) Σ (Y − Ŷ)²<small>estimate of the error variance</small></div>
       <div class="fx">RMSE = √MSE<small>back in the units of Y</small></div>
+      <figure class="fig" data-fig="penalty"><figcaption>An error of 6 adds 6 to the absolute total but 36 to the squared total. This is why MSE and RMSE overweight large errors.</figcaption></figure>
       <div class="tw"><table>
         <tr><th>Metric</th><th>Problems</th></tr>
         <tr><td>MAE</td><td>Not scale invariant</td></tr>
@@ -243,6 +247,7 @@ age       <b data-k="b1">257.7226</b>     <b data-k="se">22.502</b>   <b data-k=
       <p>All four are statements about the <b>errors</b>. The true error ε is never observed because we only estimate the β's. What we have is its estimate, the <b>residual</b>:</p>
       <div class="fx">residual = y − ŷ</div>
       <p>Two ways to check: <b>plot residuals against predicted values</b> and look for trends, changes in variation and isolated extreme points; or run a statistical test. For every test here, <b>the null hypothesis is that the assumption is met</b>.</p>
+      <figure class="fig" data-fig="residGallery"><figcaption>Residuals against predicted values. Each broken assumption leaves a different signature.</figcaption></figure>
       <p class="trap"><b>Exam trap</b>Because H₀ is "assumption holds", a <i>small</i> p-value is the bad news. A large p-value means no evidence of a problem.</p>` },
     { h: 'Cheat sheet: detect and fix', b: `
       <div class="tw"><table>
@@ -263,14 +268,16 @@ age       <b data-k="b1">257.7226</b>     <b data-k="se">22.502</b>   <b data-k=
         <li><b>Variance-stabilizing transformation.</b> Converts a heteroscedastic model into a homoscedastic one. The natural log of the target is the common example.</li>
         <li><b>Weighted least squares.</b> Minimizes a weighted sum of squared errors. You need to know which variables cause the problem.</li>
         <li><b>Adjust the standard errors.</b> This does <b>not</b> change the coefficients, only the statistical tests.</li>
-      </ul>` },
+      </ul>
+      <figure class="fig" data-fig="logFix"><figcaption>A variance-stabilizing transformation. Modeling log(price) turns the fan into an even band.</figcaption></figure>` },
     { h: 'Normality', b: `
       <p>Very hard to meet in practice, and results change little if it fails on a small scale; symmetric may be enough.</p>
       <p>The plot to use is the <b>QQ-plot</b> (normal probability plot): residuals against the quantiles expected from a Normal distribution. Normal residuals fall on a straight diagonal line.</p>
       <ul>
         <li><b>Skewness</b>: the points form one curve, a bow that leaves the line in the same direction at both ends.</li>
         <li><b>Kurtosis</b>: an S shape; the tails leave the line in opposite directions.</li>
-      </ul>` },
+      </ul>
+      <figure class="fig" data-fig="qqGallery"><figcaption>QQ-plots of residuals. Read the shape, not the individual points.</figcaption></figure>` },
     { h: 'Independence', b: `
       <p><b>Cross-sectional</b> data is collected across different individuals at one point in time. <b>Time series</b> data follows one individual over consecutive points in time, and the value at time t is usually related to the value at t + 1. The errors become correlated, which the slides say underestimates the β coefficients.</p>
       <p>Look for a cyclical pattern in the residuals, or use the Durbin-Watson test.</p>` },
@@ -283,6 +290,7 @@ age       <b data-k="b1">257.7226</b>     <b data-k="se">22.502</b>   <b data-k=
       <p><b>Signs:</b> coefficients with the wrong sign; coefficients that change dramatically when a variable is added or removed; variables that switch between significant and not.</p>
       <div class="fx">VIF<sub>j</sub> = 1 / Tolerance<sub>j</sub> = 1 / (1 − R²<sub>j</sub>)</div>
       <p>R²<sub>j</sub> comes from regressing predictor j on <b>all the other predictors</b>. The target variable is not in that model. VIF measures how much the standard error of the estimate is inflated. <b>VIF above 10 is typically considered too high.</b></p>
+      <figure class="fig" data-fig="vifCurve"><figcaption>VIF stays small for a long time and then explodes. It reaches 10 when the other predictors explain 90% of the variable.</figcaption></figure>
       <p>In Ames, the missing-garage dummies had VIF = ∞ because they were perfectly redundant: every home without a garage is missing all garage variables at once.</p>
       <p><b>Solutions:</b> drop one of the correlated variables; avoid making inferences about the parameter estimates; use a biased regression technique (later deck).</p>` },
     { h: 'Scoring the test set', b: `
@@ -343,6 +351,7 @@ age       <b data-k="b1">257.7226</b>     <b data-k="se">22.502</b>   <b data-k=
         <li>H₀: no association. Hₐ: association.</li>
         <li>The χ² distribution is bounded below by 0, right-skewed, and has one set of degrees of freedom.</li>
       </ul>
+      <figure class="fig" data-fig="chi2"><figcaption>Bounded at 0 and right-skewed. More degrees of freedom push the distribution to the right, so a bigger table needs a bigger statistic to be significant.</figcaption></figure>
       <div class="fx">χ² = Σ (Observed − Expected)² / Expected<small>df = (rows − 1)(columns − 1)</small></div>
       <div class="fx">Expected count = row total × column total / grand total</div>
       <p>Central air example: 62 homes lack central air, and 56.9% of all homes are not bonus eligible, so we expect 62 × 0.569 = 35.27 non-eligible homes there. We observe 60.</p>
@@ -372,12 +381,14 @@ age       <b data-k="b1">257.7226</b>     <b data-k="se">22.502</b>   <b data-k=
         <li>Probabilities are bounded but a line is not. What does a prediction of −0.4 or 1.1 mean?</li>
         <li>The relationship between probability and x is usually non-linear: one more unit of x matters differently near 0.5 than near 1.</li>
         <li>The properties of OLS do not hold.</li>
-      </ul>` },
+      </ul>
+      <figure class="fig" data-fig="lpm"><figcaption>The observed data are only 0s and 1s. A straight line runs past both bounds; the logistic curve flattens toward them.</figcaption></figure>` },
     { h: 'The logistic model and the logit', b: `
       <div class="fx">p = 1 / (1 + e<sup>−(β₀ + β₁x₁ + … + βₖxₖ)</sup>)</div>
       <p>Predicted probability is always between 0 and 1, the parameters do not enter linearly, and the rate of change in p varies as x varies (the S curve).</p>
       <div class="fx">logit(p) = log( p / (1 − p) ) = β₀ + β₁x₁ + … + βₖxₖ</div>
       <p>The <b>logit link</b> is the natural log of the odds. It is unbounded and <b>linear in the parameters</b>, which is why logistic output looks like linear regression output. Landmarks: p = 0.5 gives logit 0; p → 1 gives +∞; p → 0 gives −∞.</p>
+      <figure class="fig" data-fig="logitMap"><figcaption>The link function. The two labeled points are the examples from the deck.</figcaption></figure>
       <p>Click the highlighted values in the model from the deck:</p>
       <pre class="out" data-reader="logit">Dep. Variable:       bonus    No. Observations:      1095
 Model:               Logit    <b data-k="pr2">Pseudo R-squ.:       0.3529</b>
@@ -405,7 +416,8 @@ CentralAir_Y    <b data-k="lb2">4.8704</b>     0.836    5.825    <b data-k="lp">
       <p>The <b>likelihood function</b> measures how probable a given set of β values is to have produced the data. We choose the β's that <b>maximize</b> it.</p>
       <div class="fx">L = Π p<sub>i</sub><sup>y<sub>i</sub></sup> (1 − p<sub>i</sub>)<sup>1 − y<sub>i</sub></sup></div>
       <p>In words: multiply p for every 1 and (1 − p) for every 0. The slide example with eight homes gives 0.994 × 0.962 × (1 − 0.618) × 0.535 × (1 − 0.366) × 0.328 × (1 − 0.171) × (1 − 0.026) = 0.0327. The log-likelihood, Σ [y log p + (1 − y) log(1 − p)], is easier to work with.</p>
-      <p>With separation the likelihood has no maximum: it keeps climbing as β heads to infinity, so the estimation does not converge.</p>` },
+      <p>With separation the likelihood has no maximum: it keeps climbing as β heads to infinity, so the estimation does not converge.</p>
+      <figure class="fig" data-fig="likelihood"><figcaption>Maximum likelihood looks for the top of the curve. With separation there is no top.</figcaption></figure>` },
     { h: 'Likelihood ratio test', b: `
       <p>If extra predictors add little, the model with them should not be much more likely than the model without. The <b>likelihood ratio test (LRT)</b> compares a <b>full</b> model with a <b>reduced</b> model nested inside it.</p>
       <p>Use it for a categorical variable with more than two levels. The individual dummy p-values do not show every comparison between levels, so compare the model with and without the whole variable:</p>
@@ -526,7 +538,8 @@ CentralAir_Y    <b data-k="lb2">4.8704</b>     0.836    5.825    <b data-k="lp">
         <li>Curve <b>above</b> the 45° line: the model predicts <b>lower</b> probabilities than actually observed.</li>
         <li>Curve <b>below</b> the 45° line: the model predicts <b>higher</b> probabilities than observed.</li>
       </ul>
-      <p>Logistic regressions are stable and natively well calibrated; more advanced ML models often are not. Calibration depends on the observed proportion of events, so it is best used as a goodness-of-fit check in training rather than on validation data.</p>` },
+      <p>Logistic regressions are stable and natively well calibrated; more advanced ML models often are not. Calibration depends on the observed proportion of events, so it is best used as a goodness-of-fit check in training rather than on validation data.</p>
+      <figure class="fig" data-fig="calib"><figcaption>A well-calibrated model follows the dashed 45° line.</figcaption></figure>` },
     { h: 'Classification table', b: `
       <p>Classifying forces ŷ = 1 when the predicted probability passes a <b>cut-off</b> (threshold), for example 0.5. Strict classification throws away the information in the probabilities themselves, and the table changes when the cut-off changes.</p>
       <div class="cm" style="max-width:420px">
@@ -551,10 +564,12 @@ CentralAir_Y    <b data-k="lb2">4.8704</b>     0.836    5.825    <b data-k="lp">
       <div class="fx">F₁ = 2 × (precision × recall) / (precision + recall)</div>
       <p>F₁ is the precision-recall version of Youden's index. The cut-off that maximizes F₁ <b>does not typically match</b> the Youden cut-off.</p>` },
     { h: 'ROC curve and AUC', b: `
-      <p>The ROC curve plots the <b>true positive rate (sensitivity)</b> against the <b>false positive rate (1 − specificity)</b> across a grid of thresholds. The area under it, <b>AUC</b> or AUROC, summarizes the whole curve and is <b>equivalent to the c-statistic</b>. You want high sensitivity and high specificity: a curve that hugs the top-left corner.</p>` },
+      <p>The ROC curve plots the <b>true positive rate (sensitivity)</b> against the <b>false positive rate (1 − specificity)</b> across a grid of thresholds. The area under it, <b>AUC</b> or AUROC, summarizes the whole curve and is <b>equivalent to the c-statistic</b>. You want high sensitivity and high specificity: a curve that hugs the top-left corner.</p>
+      <figure class="fig" data-fig="roc"><figcaption>Each point on a curve is one cut-off. The closer the curve gets to the top-left corner, the larger the area under it.</figcaption></figure>` },
     { h: 'Lift and gains', b: `
       <div class="fx">Lift = PPV / π₁<small>π₁ = overall proportion of events</small></div>
-      <p>Common in marketing. Interpretation: in the top <i>depth</i>% of customers ranked by predicted probability, you get <i>lift</i> times as many responses as you would by targeting a random sample of the same size. The cumulative capture (gain) chart shows the share of all events captured by each depth.</p>` },
+      <p>Common in marketing. Interpretation: in the top <i>depth</i>% of customers ranked by predicted probability, you get <i>lift</i> times as many responses as you would by targeting a random sample of the same size. The cumulative capture (gain) chart shows the share of all events captured by each depth.</p>
+      <figure class="fig" data-fig="lift"><figcaption>Lift is highest for the best-scored customers and falls to 1 once everyone is targeted. The gain chart shows the same model cumulatively.</figcaption></figure>` },
     { h: 'Accuracy can fool you', b: `
       <p>If 5% of the data are events, a model that predicts "non-event" for everyone is 95% accurate and useless. Accuracy and error are fine to report but not to choose models with.</p>
       <p>Classification is a decision that sits outside the statistical model. It assumes the cost is the same for every individual, so it is useful for groups and risky for single-observation decisions.</p>` },
@@ -565,6 +580,7 @@ CentralAir_Y    <b data-k="lb2">4.8704</b>     0.836    5.825    <b data-k="lp">
         <li><b>Oversampling is not needed</b> for logistic regression. The problem is the default 0.5 cut-off, not the probabilities. Adjust the cut-off.</li>
         <li>Other ML models will not be this easy.</li>
       </ul>
+      <figure class="fig" data-fig="rare"><figcaption>With a rare event the model still ranks events above non-events, but nearly every probability is below 0.5. Move the cut-off; do not resample.</figcaption></figure>
       <p class="site"><b>From the course site</b><b>Oversampling</b> replicates the rare events until they balance the non-events (bigger training set). <b>Undersampling</b> randomly keeps only enough non-events to match the events (smaller training set). Either one biases the predicted probabilities upward, so the model must be corrected by <b>adjusting the intercept</b> or by <b>weighting</b>.</p>` },
   ],
   cards: [
@@ -714,3 +730,56 @@ const NUMBERS = [
   ['n < 2,000', 'Shapiro-Wilk rather than Anderson-Darling'],
   ['c − 1', 'Dummy variables for c categories'],
 ];
+
+/* Questions from Ben's past course quizzes (weeks 1-4), reworded. Appended to each unit's quiz and listed together on the Past quizzes page. */
+const SEP_TABLE = `<div class="tw"><table><tr><th>Income level</th><th class="n">Bought</th><th class="n">Did not buy</th></tr>
+<tr><td>Low</td><td class="n">0</td><td class="n">14</td></tr><tr><td>Medium</td><td class="n">9</td><td class="n">12</td></tr>
+<tr><td>High</td><td class="n">15</td><td class="n">8</td></tr><tr><td>Very High</td><td class="n">11</td><td class="n">1</td></tr></table></div>`;
+const PAST = [
+  { u: 'data', t: 'mc', q: 'A test dataset can be used for imputation of variables, just not for model building.', o: TF, a: 1, why: 'False. Imputation values such as the median are estimated from the training data only and then applied to the test set. Using the test set leaks information.' },
+  { u: 'data', t: 'mc', q: 'Which dimension reduction technique should NOT be performed before splitting the data into training and testing?', o: ['Business logic / context', 'Low variability', 'Too much missingness', 'All of these can be done before the split'], a: 3, why: 'All three are done on the full Ames data in the deck before the split. What must wait until after the split is anything calculated to feed the model, such as median imputation and the statistical tests.' },
+  { u: 'intro', t: 'mc', q: 'What is the main difference between simple and multiple linear regression?', o: ['Multiple regression can only have categorical predictors', 'Multiple regression has more than one predictor variable', 'Multiple regression has more than one target variable', 'Simple regression has more than one predictor variable'], a: 1, why: 'Simple: one predictor for a continuous target. Multiple: many predictors, continuous or categorical, for one continuous target.' },
+  { u: 'build', t: 'mc', q: 'Which model metric does not depend on the scale of the data?', o: ['MAPE', 'MAE', 'MSE', 'MACE'], a: 0, why: 'MAPE is a percentage, so it is unit-free. The slides list "not scale invariant" as a problem for MAE, MSE and RMSE.' },
+  { u: 'build', t: 'mc', q: 'You run backward selection on a linear regression with 10 predictors, without cross-validation. How many models are built in the first pass?', o: ['8', '10', '11', '0'], a: 2, why: 'One full model with all 10 predictors (the base model), plus 10 models that each leave one predictor out: 11.' },
+  { u: 'build', t: 'mc', q: 'As the sample size goes up, what should happen to the significance level we compare p-values to?', o: ['It should get smaller', 'It should get larger', 'It should always be 0.05', 'It should stay the same'], a: 0, why: 'Raftery\'s table: larger samples make almost anything significant at 0.05, so the cut-off shrinks (0.009 near n = 1,000).' },
+  { u: 'build', t: 'short', q: 'Why is it good practice not to build all of our models on the whole dataset?', why: 'A model can memorize the data it was built on and look great, then do badly on new data (overfitting). Holding out a test set lets you build on one part and check on data the model has never seen, which gives an honest picture of how well it really works.' },
+  { u: 'build', t: 'mc', q: 'Which statement best describes a selection algorithm?', o: ['A specific metric such as MAPE', 'An automated technique that evaluates variables based on some model metric', 'A way of splitting data into folds', 'The testing dataset used for final comparison'], a: 1, why: 'The metric is the yardstick; the selection algorithm (forward, backward, stepwise) is the automated search that uses it.' },
+  { u: 'build', t: 'mc', q: 'Why can standard Recursive Feature Elimination (RFE) mislead when predictors are not standardized?', o: ['It optimizes R² instead of MSE', 'It ranks features using coefficient magnitudes', 'It requires a binary target', 'It computes cross-validation scores on training data'], a: 1, why: 'Coefficient size depends on the units of the variable, so a large coefficient does not mean a better variable.' },
+  { u: 'build', t: 'mc', q: 'In the sequential feature selector, why are some metrics defined as negative versions of themselves (negative MSE)?', o: ['To turn a loss metric into something to maximize', 'To penalize collinear predictors', 'To correct skewness in the target', 'To force the algorithm to run backward'], a: 0, why: 'The selector always looks for the highest score. For error metrics lower is better, so the negative is used: maximizing −MSE is minimizing MSE.' },
+  { u: 'build', t: 'mc', q: 'Income is re-measured in dollars instead of thousands of dollars. What happens to its p-value in the regression?', o: ['It decreases', 'It increases', 'It remains unchanged'], a: 2, why: 'The coefficient and its standard error change by the same factor, so the test statistic and p-value are identical.' },
+  { u: 'build', t: 'short', q: 'Explain the core idea of k-fold cross-validation and why it is used in model selection.', why: 'Split the training data into k pieces. Build the model on k − 1 pieces and evaluate on the one left out; repeat so every piece is held out once, then average the k results. It prevents overfitting when tuning a model (such as choosing the number of variables) because candidates are judged on data they were not built on.' },
+  { u: 'build', t: 'mc', q: 'With k-fold cross-validation for variable selection, how are candidate variable subsets evaluated at each step?', o: ['By averaging coefficients across folds', 'By univariate tests on the complete dataset', 'By averaging metrics across the hold-out validation folds', 'By performance on the original test dataset'], a: 2, why: 'Look at validation instead of training at each step: which candidate is better on average across all validation sets? The test set stays untouched.' },
+  { u: 'build', t: 'mc', q: 'Which selection techniques start with an intercept-only model?', o: ['Forward only', 'Forward and stepwise', 'Backward and RFE', 'Forward, stepwise and backward'], a: 1, why: 'Forward and stepwise both start from the null model. Backward and RFE start from the full model.' },
+  { u: 'build', t: 'short', q: 'What is the fundamental difference between forward selection and stepwise selection?', why: 'Forward selection only adds: once a variable is in, it stays. Stepwise adds the same way but can also delete a variable already in the model at each step.' },
+  { u: 'build', t: 'mc', q: 'Forward and backward selection always end with the same variables in the final model.', o: TF, a: 1, why: 'False. Not all techniques agree.' },
+  { u: 'diag', t: 'short', q: 'List two linear regression assumptions that involve the errors of the model.', why: 'Any two of: the errors have constant variance; the errors are Normally distributed with mean 0; the errors are independent of each other.' },
+  { u: 'diag', t: 'mc', q: 'Residuals are an estimate of what?', o: ['Coefficients of the variables', 'Errors from the true model', 'Normality of the model', 'Variance of the true model'], a: 1, why: 'The true errors are never observed because the β\'s are estimated. The residual y − ŷ is our estimate of the error.' },
+  { u: 'diag', t: 'num', q: 'A fitted regression is ŷ = 3 + 2x. A real data point has y = 8 and x = 4. What is the residual?', a: -3, tol: 0, why: 'ŷ = 3 + 2(4) = 11. Residual = y − ŷ = 8 − 11 = −3.' },
+  { u: 'diag', t: 'mc', q: 'Which assumption cannot be evaluated with a plot of residuals against predicted values?', o: ['Independence', 'Normality', 'Constant variance', 'Linearity'], a: 1, why: 'The slides: visual checks of Normality are different from residuals vs. predicted. Normality needs a QQ-plot (or histogram) of the residuals.' },
+  { u: 'diag', t: 'mc', q: 'The p-value for the Breusch-Pagan test is 0.23. What does this tell you?', o: ['Fails the constant variance assumption', 'Passes the constant variance assumption', 'Fails the Normality assumption', 'Passes the independence assumption'], a: 1, why: 'H₀ is homoscedasticity. A large p-value fails to reject it, so there is no evidence of unequal variance.' },
+  { u: 'diag', t: 'mc', q: 'The p-value for the Durbin-Watson test is 0.54. What does this tell you about Normality?', o: ['Passes the Normality assumption', 'Fails the Normality assumption', 'Durbin-Watson is not used to test Normality'], a: 2, why: 'Durbin-Watson tests independence (residual correlation). Normality uses Shapiro-Wilk or Anderson-Darling.' },
+  { u: 'diag', t: 'mc', fig: 'qqSkew', q: 'What problem does this QQ-plot of residuals show?', o: ['No problem', 'Skewness problem', 'Kurtosis problem'], a: 1, why: 'A single bow shape is skewness. A kurtosis problem makes an S, with the two tails leaving the line in opposite directions.' },
+  { u: 'diag', t: 'mc', q: 'What common transformation might solve both heteroscedasticity and lack of Normality?', o: ['Inverse', 'Quadratic', 'Natural log', 'Log base 10'], a: 2, why: 'The natural log of the target is the slides\' example of a variance-stabilizing transformation and their transformation for non-Normal residuals.' },
+  { u: 'diag', t: 'mc', q: 'Multicollinearity occurs when which of these are correlated?', o: ['Predictor variables and the target variable', 'Target variables and other target variables', 'Predictor variables and other predictor variables'], a: 2, why: 'Predictors correlated with each other. Predictors correlated with the target is what you want.' },
+  { u: 'diag', t: 'short', q: 'A model has predictors x₁, x₂, x₃, x₄. Explain what R²₂ (from the VIF calculation for x₂) is and how it differs from the overall model R².', why: 'R²₂ comes from regressing x₂ on the other three predictors (x₁, x₃, x₄). It says how much of x₂ the other x\'s can predict; a high value means multicollinearity, since VIF₂ = 1 / (1 − R²₂). The overall R² comes from regressing y on all four predictors and says how much of the target the model explains. R²₂ does not involve y at all.' },
+  { u: 'diag', t: 'mc', q: 'Two variables are highly correlated with each other. To solve the multicollinearity problem we should delete both of them.', o: TF, a: 1, why: 'False. Drop one of the correlated variables. They carry similar information, so keeping one keeps that information.' },
+  { u: 'diag', t: 'mc', q: 'With test data, we only score the test dataset with our model; we do not rebuild the model on it.', o: TF, a: 0, why: 'True. To score you apply the final model\'s equation to the test data. You do not rerun the algorithm or go back and rebuild.' },
+  { u: 'logit', t: 'mc', q: 'Logistic regression can be used to predict which kind of categorical variable?', o: ['Nominal', 'Ordinal', 'Binary', 'All of the above'], a: 3, why: 'The deck shows logistic regression for a categorical target branching into binary, ordinal and nominal versions. This matches practice midterm question 16.' },
+  { u: 'logit', t: 'mc', q: 'Two binary variables have a Pearson χ² p-value of 0.67. At a significance level of 0.01, what can you conclude?', o: ['A χ² test cannot compare two binary variables', 'Statistically, there is an association', 'Statistically, there is no association'], a: 2, why: 'H₀ is no association. 0.67 is far above 0.01, so H₀ is not rejected.' },
+  { u: 'logit', t: 'mc', q: 'Customer loyalty tier (Bronze, Silver, Gold, Platinum) is what type of variable?', o: ['Nominal', 'Ordinal', 'Binary', 'Continuous'], a: 1, why: 'The tiers have a logical order. Satisfaction (unsatisfied to very satisfied) is ordinal for the same reason.' },
+  { u: 'logit', t: 'mc', q: 'Traffic channel (search, email, social, direct) is what type of variable?', o: ['Nominal', 'Ordinal', 'Binary', 'Continuous'], a: 0, why: 'Labels with no logical order. Device type and customer segment are nominal too; a yes/no loyalty flag is binary.' },
+  { u: 'logit', t: 'mc', q: 'In binary classification, what issue arises when one target category is 5% or less of the observations?', o: ['A rare event problem that makes classification difficult', 'A linear regression is needed instead', 'The odds ratio exceeds 1,000', 'The Pearson test equals 0'], a: 0, why: '5% or smaller in a target category is a rare event and can lead to classification problems.' },
+  { u: 'logit', t: 'mc', q: 'Non-statistical dimension reduction (business logic, too much missingness) applies only to a continuous target, not a categorical one.', o: TF, a: 1, why: 'False. Those techniques are about the predictors, so they apply whatever the target is. The logistic deck marks them "already done".' },
+  { u: 'logit', t: 'mc', q: 'Which best describes observed and expected counts in a Pearson test?', o: ['Observed are for nominal variables; expected are for ordinal variables', 'Observed are the sample size needed; expected are the data collected', 'Observed are the actual frequencies; expected are the frequencies predicted if the variables were not related', 'Observed must exceed 5; expected need not'], a: 2, why: 'Expected = row total × column total / grand total, the count you would see under no association. The test measures how far the observed counts are from that.' },
+  { u: 'logit', t: 'num', q: 'The probability of rain is 0.8. What are the odds of rain?', a: 4, tol: 0.01, why: 'Odds = p / (1 − p) = 0.8 / 0.2 = 4.' },
+  { u: 'logit', t: 'mc', ctx: SEP_TABLE, q: 'Which income level creates a quasi-complete separation problem for predicting purchase?', o: ['Low only', 'Very High only', 'Low and Very High', 'None'], a: 0, why: 'Low has a zero cell (no buyers). Very High is lopsided at 11 to 1 but has no zero, so it does not cause separation.' },
+  { u: 'logit', t: 'mc', q: 'For a binary (0, 1) target, a regression model predicts which of the following?', o: ['The mean of the 0s and 1s', 'The probability of a 1', 'The proportion of 1s in the data', 'All of the above'], a: 3, why: 'Regression models the expected (mean) response. For a 0/1 variable the mean is the proportion of 1s, which is the probability of a 1.' },
+  { u: 'logit', t: 'short', q: 'Explain one reason linear regression is not as good as logistic regression for a categorical target.', why: 'A straight line can predict below 0 or above 1, which makes no sense for a probability. The logistic S curve keeps every prediction between 0 and 1.' },
+  { u: 'logit', t: 'mc', q: 'A nominal predictor has quasi-complete separation. You should combine the problem category with a category on either side of it.', o: TF, a: 1, why: 'False. Nominal categories have no order, so there are no "sides". Neighbouring categories are combined only for ordinal variables; nominal levels are clustered with a similar category.' },
+  { u: 'logit', t: 'mc', q: 'Which expression is the logit?', o: ['p / (1 − p)', 'log(p / (1 − p))', '1 / (1 + e^−p)', 'log(p)'], a: 1, why: 'The log of the odds. It stretches the 0 to 1 probability scale onto −∞ to +∞ so the right-hand side can be linear.' },
+  { u: 'logit', t: 'mc', q: 'In a logistic regression, whenever X goes up by 1 the predicted probability goes up by the same amount, whatever the value of X.', o: TF, a: 1, why: 'False. The logit changes by a constant β, but the change in probability depends on where you are on the S curve: largest near 0.5, tiny near 0 or 1.' },
+  { u: 'logit', t: 'num', q: 'A logistic regression gives β = 1.1 for a loyalty-program dummy. What is the odds ratio? (2 decimals)', a: 3, tol: 0.011, why: 'e^1.1 = 3.00.' },
+  { u: 'logit', t: 'short', q: 'Interpret an odds ratio of 3.00 for being in the loyalty program when the target is purchasing the new product.', why: 'Customers in the loyalty program have about 3 times the odds of purchasing the new product compared with customers not in the program, on average. Equivalently, about 200% higher odds.' },
+  { u: 'logit', t: 'mc', q: 'Which of these appears in the logistic regression output but not in the linear regression output?', o: ['P-values for the variables', 'Optimization success or failure', 'Variable coefficients'], a: 1, why: 'Logistic regression is fit by maximum likelihood, an iterative search, so the output reports whether it converged. Both outputs show coefficients and p-values.' },
+];
+PAST.forEach(p => { const u = UNITS.find(x => x.id === p.u); p.past = true; p.key = `${u.id}-${u.quiz.length}`; u.quiz.push(p); });

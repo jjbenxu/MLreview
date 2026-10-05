@@ -8,7 +8,7 @@ const done = () => store.get('q', {});
 const mark = (key, ok) => { const q = done(); q[key] = ok ? 1 : 0; store.set('q', q); nav(); };
 const unitScore = u => { const q = done(); return u.quiz.filter((_, i) => q[`${u.id}-${i}`] === 1).length; };
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const EXTRA = [['practice', 'Practice midterm', 'P'], ['mock', 'Mock exam', 'M'], ['formulas', 'Formula sheet', 'ƒ']];
+const EXTRA = [['practice', 'Practice midterm', 'P'], ['past', 'Past quizzes', 'Q'], ['mock', 'Mock exam', 'M'], ['formulas', 'Formula sheet', 'ƒ']];
 const KIND = { mc: 'Multiple choice', num: 'Calculate', fill: 'Fill in the blank', short: 'Short answer' };
 
 function route() {
@@ -28,7 +28,7 @@ function nav() {
 function question(q, key, label) {
   const el = document.createElement('article'); el.className = 'q';
   const prev = done()[key];
-  el.innerHTML = `<div class="q-head"><span class="q-n">${label}</span><span class="q-t">${q.q}</span><span class="q-kind">${KIND[q.t]}${prev === 1 ? ' · ✓' : ''}</span></div>` +
+  el.innerHTML = `<div class="q-head"><span class="q-n">${label}</span><span class="q-t">${q.q}</span><span class="q-kind">${q.past ? 'Past quiz · ' : ''}${KIND[q.t]}${prev === 1 ? ' · ✓' : ''}</span></div>` +
     (q.ctx ? `<div class="ctx">${q.ctx}</div>` : '') + (q.fig ? '<canvas class="fig"></canvas>' : '') + '<div class="body"></div><div class="why" hidden></div>';
   if (q.fig) drawFig($('.fig', el), q.fig, 5, 400);
   const body = $('.body', el), why = $('.why', el);
@@ -49,7 +49,7 @@ function question(q, key, label) {
     const ans = q.t === 'num' ? String(q.a) : q.accept[0];
     const check = () => {
       const v = inp.value.trim().toLowerCase(); if (!v) return;
-      const ok = q.t === 'num' ? Math.abs(parseFloat(v.replace(/[%,$]/g, '')) - q.a) <= (q.tol || 0) + 1e-9 : q.accept.some(a => v.includes(a));
+      const ok = q.t === 'num' ? Math.abs(parseFloat(v.replace(/[%,$]/g, '').replace('−', '-')) - q.a) <= (q.tol || 0) + 1e-9 : q.accept.some(a => v.includes(a));
       reveal(ok, ok ? 'Correct.' : `Not quite. Answer: ${ans}.`);
     };
     chk.onclick = check; inp.onkeydown = e => { if (e.key === 'Enter') check(); };
@@ -72,6 +72,7 @@ function home(main) {
     <div class="grid">${UNITS.map((u, i) => `<a class="tile" href="#${u.id}"><span class="num">UNIT 0${i + 1}</span><strong>${u.title}</strong><span class="d">${u.lede}</span><div class="bar"><i style="width:${unitScore(u) / u.quiz.length * 100}%"></i></div></a>`).join('')}</div>
     <div class="sec"><h2>When you are short on time</h2><div class="grid">
       <a class="tile" href="#practice"><span class="num">START HERE</span><strong>Practice midterm</strong><span class="d">The instructor's sample questions with worked answers.</span></a>
+      <a class="tile" href="#past"><span class="num">SEEN BEFORE</span><strong>Past quizzes</strong><span class="d">${PAST.length} questions from the course quizzes so far.</span></a>
       <a class="tile" href="#mock"><span class="num">TEST YOURSELF</span><strong>Mock exam</strong><span class="d">Twenty questions drawn at random from all seven units.</span></a>
       <a class="tile" href="#formulas"><span class="num">MEMORIZE</span><strong>Formula sheet</strong><span class="d">Every formula, test and rule-of-thumb number in one place.</span></a>
     </div></div>
@@ -99,6 +100,7 @@ function unit(main, u, tab) {
       `<section class="sec"><h2>Go deeper</h2><div class="prose"><ul>${u.links.map(([t, h]) => `<li><a href="${h}" target="_blank" rel="noopener">${t}</a></li>`).join('')}</ul></div>
       <div class="row"><button class="btn" data-go="lab">Open the lab</button><button class="btn alt" data-go="quiz">Take the quiz</button></div></section>`;
     $$('[data-go]', pane).forEach(b => b.onclick = () => location.hash = `${u.id}.${b.dataset.go}`);
+    $$('[data-fig]', pane).forEach(f => NOTEFIGS[f.dataset.fig](f));
     $$('[data-reader]', pane).forEach(pre => {
       const id = pre.dataset.reader, note = $(`[data-note="${id}"]`, pane);
       pre.onclick = e => { const b = e.target.closest('b[data-k]'); if (!b) return; $$('b', pre).forEach(x => x.classList.toggle('on', x === b)); const [t, d] = READERS[id][b.dataset.k]; note.innerHTML = `<strong>${t}</strong><br>${d}`; };
@@ -133,6 +135,17 @@ function practice(main) {
     const el = question(p, 'practice-' + p.n, 'Q' + p.n), u = UNITS.find(x => x.id === p.u);
     const a = document.createElement('a'); a.href = '#' + u.id; a.className = 'note'; a.textContent = `Review: ${u.title} →`; el.append(a);
     $('#pq', main).append(el);
+  });
+}
+
+function past(main) {
+  main.innerHTML = `<div class="col"><header><p class="eyebrow">From your course quizzes</p><h1>Past quizzes</h1></header>
+    <p class="lede">${PAST.length} questions from the quizzes already taken, reworded and grouped by unit. Each one also appears at the end of its unit's quiz. Answers were checked against the lecture decks, not an official key.</p>
+    <div class="col" id="pz" style="gap:14px"></div></div>`;
+  UNITS.forEach(u => {
+    const qs = PAST.filter(p => p.u === u.id); if (!qs.length) return;
+    const h = document.createElement('h2'); h.textContent = u.title; $('#pz', main).append(h);
+    qs.forEach((p, i) => $('#pz', main).append(question(p, p.key, 'Q' + (i + 1))));
   });
 }
 
@@ -175,7 +188,7 @@ function formulas(main) {
 function render() {
   const { page, tab } = route(), main = $('#main'), u = UNITS.find(x => x.id === page);
   if (u) unit(main, u, ['notes', 'lab', 'cards', 'quiz'].includes(tab) ? tab : 'notes');
-  else if (page === 'practice') practice(main); else if (page === 'mock') mock(main); else if (page === 'formulas') formulas(main); else home(main);
+  else if (page === 'practice') practice(main); else if (page === 'past') past(main); else if (page === 'mock') mock(main); else if (page === 'formulas') formulas(main); else home(main);
   nav(); document.title = (u ? u.title : page === 'home' ? 'Overview' : EXTRA.find(e => e[0] === page)?.[1] || 'Overview') + ' · ML Midterm Review';
   window.scrollTo(0, 0);
 }
