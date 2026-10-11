@@ -485,7 +485,7 @@ CentralAir_Y    <b data-k="lb2">4.8704</b>     0.836    5.825    <b data-k="lp">
       <div class="fx">LRT statistic = −2 × (LL<sub>reduced</sub> − LL<sub>full</sub>)<small>χ² with df = number of parameters removed</small></div>
       <p>Slide example: the full model (GrLivArea and CentralAir) has log-likelihood −484.379; the reduced model (GrLivArea only) has −520.659. The statistic is −2 × (−520.659 + 484.379) = 72.56 with 1 degree of freedom and a p-value near 0, so central air adds information.</p>` },
     { h: 'Assumption and predictions', b: `
-      <p>The assumption for continuous predictors is that they are <b>linear in the logit</b>. There is no easy test. Build a more flexible model, a GAM that uses splines for each f(x), and compare the two with an LRT. If the GAM says a straight line is good enough, the assumption is met.</p>
+      <p>Logistic regression has two assumptions. <b>Independence</b>: the observations are independent of each other, as in linear regression. <b>Linearity of the logit</b>: each continuous predictor has a straight-line relationship with the log-odds (it applies only to continuous variables; a dummy has just two points). There is no easy test for the second one. Build a more flexible model, a GAM that uses splines for each f(x), and compare the two with an LRT. If the GAM says a straight line is good enough, the assumption is met.</p>
       <p>If it fails: use the GAM logistic model (with more limited interpretation for that variable), or <b>bin</b> the continuous variable, which keeps the model interpretable.</p>
       <p>Slide example: GrLivArea was cut into three bins, up to 1,250, 1,250 to 4,500, and above 4,500 square feet, with the smallest bin as the reference. The middle bin's coefficient was 3.39 (p = 0.000): e<sup>3.39</sup> ≈ 29.7 times the odds of the smallest homes. The top bin's was 2.83 with p = 0.048, not significant at 0.009 because very few homes are that large. A binned variable is read like any other categorical dummy.</p>
       <p>After fitting, convert logits back to probabilities for predictions. The slide's five homes: 1,500 sq ft without central air 0.006; 2,000 with 0.863; 2,250 with 0.947; 2,500 without 0.279; 3,500 with 0.9997. The 2,500 sq ft home without central air scores far below the smaller 2,000 sq ft home with it, which shows how much central air matters in this model.</p>` },
@@ -503,6 +503,7 @@ CentralAir_Y    <b data-k="lb2">4.8704</b>     0.836    5.825    <b data-k="lp">
     ['Percent change in odds for a one-unit increase', '100 × (e^β − 1) percent.'],
     ['x needed to double the odds', 'log(2) / β.'],
     ['Likelihood ratio test', 'Compares a full model with a nested reduced model. Used for categorical variables with more than two levels.'],
+    ['Two assumptions of logistic regression', 'Independence of observations, and linearity of the logit for continuous predictors.'],
     ['How to check linearity in the logit', 'Fit a GAM and compare it with the plain logistic model using an LRT. If it fails, use the GAM or bin the variable.'],
     ['Rare event threshold', '5% or less of the target in one category.'],
   ],
